@@ -10,6 +10,8 @@ class Customers{
     public $position;
     public $company_id;
 
+    private $company;
+    private $conversation;
 
     /**
      * @param $id
@@ -33,12 +35,32 @@ class Customers{
         $this->company_id = $company_id;
     }
 
-    public static function getCustomer($id){
+
+    public static function getCustomers(){
+        $pdo=DB::getPDO();
+        $stm=$pdo->prepare("SELECT * FROM customers");
+        $stm->execute([]);
+        $customers=[];
+        foreach ($stm->fetchAll(PDO::FETCH_ASSOC) as $c){
+            $customers[]=new Customers($c['name'],$c['surname'],$c['phone'],$c['email'],$c['address'],$c['position'],$c['company_id'], $c['id']);
+        }
+        return $customers;
+    }
+
+    public function getCompany() {
+        if ($this->company==null){
+            $this->company= Companies::getCompany($this->company_id);
+        }
+
+        return  $this->company;
+    }
+
+    public static function getCustomer($id=null){
         $pdo=DB::getPDO();
         $stm=$pdo->prepare("SELECT * FROM customers WHERE id=?");
         $stm->execute([$id]);
         $c=$stm->fetch(PDO::FETCH_ASSOC);
-        $company=new Customers($c['name'],$c['surname'],$c['phone'],$c['email'],$c['address'],$c['position'],$c['company_id'],$id);
+        $customer=new Customers($c['name'],$c['surname'],$c['phone'],$c['email'],$c['address'],$c['position'],$c['company_id'],$c['id']);
         return $customer;
     }
 
@@ -54,23 +76,14 @@ class Customers{
             $stm->execute([$this->name, $this->surname, $this->phone, $this->email, $this->address, $this->position, $this->company_id, $this->id]);
         }
     }
-// Trynimo f-ja
-    public function delete(){
+// Kliento trynimo f-ja
+    public function deleteCustomer(){
         $pdo=DB::getPDO();
         $stm=$pdo->prepare("DELETE FROM customers WHERE id=?");
         $stm->execute([ $this->id ]);
     }
 
-    public static function getCustomers(){
-        $pdo=DB::getPDO();
-        $stm=$pdo->prepare("SELECT * FROM customers");
-        $stm->execute([]);
-        $customers=[];
-        foreach ($stm->fetchAll(PDO::FETCH_ASSOC) as $c){
-            $customers[]=new Customers($c['id'],$c['name'],$c['surname'],$c['phone'],$c['email'],$c['address'],$c['position'],$c['company_id']);
-        }
-        return $customers;
-    }
+
 
     public static function getThisCompany($id){
         $pdo=DB::getPDO();

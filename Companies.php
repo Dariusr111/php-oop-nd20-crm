@@ -30,14 +30,7 @@ class Companies{
         $this->email = $email;
     }
 
-    public static function getCompany($id){
-        $pdo=DB::getPDO();
-        $stm=$pdo->prepare("SELECT * FROM companies WHERE id=?");
-        $stm->execute([$id]);
-        $c=$stm->fetch(PDO::FETCH_ASSOC);
-        $company=new Companies($c['name'],$c['address'],$c['vat_code'],$c['company_name'],$c['phone'],$c['email'],$id);
-        return $company;
-    }
+
 
 // jei nėra id - kuria, jei yra - atnaujina.
     public function save(){
@@ -52,12 +45,43 @@ class Companies{
         }
     }
 
-// Trynimo f-ja
-    public function delete(){
+// Kompanijos trynimo f-ja
+    public function deleteCompany(){
         $pdo=DB::getPDO();
         $stm=$pdo->prepare("DELETE FROM companies WHERE id=?");
         $stm->execute([ $this->id ]);
     }
+
+// Kompanijos kūrimo f-ja
+    public function create(){
+        $pdo=DB::getPDO();
+        $stm=$pdo->prepare("INSERT INTO companies (name, address, vat_code, company_name, phone, email) VALUES (?,?,?,?,?,?)");
+        $stm->execute([ $this->name, $this->address, $this->vat_code, $this->company_name, $this->phone, $this->email ]);
+    }
+
+    public static function getCompany($id){
+        $pdo=DB::getPDO();
+        $stm=$pdo->prepare("SELECT * FROM companies WHERE id=?");
+        $stm->execute([$id]);
+        $c=$stm->fetch(PDO::FETCH_ASSOC);
+        $company=new Companies($c['name'],$c['address'],$c['vat_code'],$c['company_name'],$c['phone'],$c['email'], $id);
+        return $company;
+    }
+
+    public static function getCompanies(){
+        $pdo=DB::getPDO();
+        $stm=$pdo->prepare("SELECT * FROM companies");
+        $stm->execute([]);
+        $companys=[];
+        foreach ($stm->fetchAll(PDO::FETCH_ASSOC) as $c){
+            $companys[]=new Companies($c['name'],$c['address'],$c['vat_code'],$c['company_name'],$c['phone'],$c['email'],$c['id']);
+        }
+        return $companys;
+    }
+
+
+
+
 
 
 }

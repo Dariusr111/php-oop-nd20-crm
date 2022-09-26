@@ -12,10 +12,32 @@ include_once "DB.php";
 include_once "Companies.php";
 include_once "Customers.php";
 include_once "Contact_information.php";
+include_once "lib/BladeOne.php";
+use eftec\bladeone\BladeOne;
+
+
+if (isset($_GET['deleteCompany_id'])){
+    $company=Companies::getCompany($_GET['deleteCompany_id']);
+    $company->deleteCompany();
+    header("location:index.php");
+}
+if (isset($_GET['deleteCustomer_id'])){
+    $customer=Customers::getCustomer($_GET['deleteCustomer_id']);
+    $customer->deleteCustomer();
+    header("location:index.php");
+}
+
+$companies = Companies::getCompanies();
+$blade=new BladeOne();
+echo $blade->run("companies", ["companies"=>$companies]);
+
+$customers = Customers::getCustomers();
+$blade1=new BladeOne();
+echo $blade1->run("customers", ["customers"=>$customers]);
 
 //Trinam kompaniją
 //$company=Companies::getCompany(5);
-//$company->delete();
+//$company->deleteCompany();
 
 // Atnaujinam kompaniją
 //$company=Companies::getCompany(3);
@@ -67,8 +89,9 @@ include_once "Contact_information.php";
 //print_r ($conversation);
 
 //Atspauzdinam sudurtinę informaciją
-$company=Customers::getThisCompany(1);
-echo $company->name;
+//$company=Customers::getThisCompany(1);
+//echo $company->name;
+
 
 
 
